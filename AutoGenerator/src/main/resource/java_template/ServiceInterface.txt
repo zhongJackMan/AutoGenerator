@@ -13,7 +13,7 @@ public interface $FileNameService {
      * @param $FileNameDTO
      * @return
      */
-    Integer updateByCondition($FileNameDTO $FileNameDTO);
+    Integer updateByCondition($FileNameDTO $fileNameDTO);
 
     /**
      * 按ID更新
@@ -41,7 +41,7 @@ public interface $FileNameService {
      * @param $FileNameDTO
      * @return
      */
-    Integer deleteByCondition($FileNameDTO $FileNameDTO);
+    Integer deleteByCondition($FileNameDTO $fileNameDTO);
 
     /**
      * 按ID删除

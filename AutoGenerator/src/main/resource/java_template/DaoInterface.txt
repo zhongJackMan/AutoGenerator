@@ -1,0 +1,52 @@
+package;
+
+public interface $FileNameDao {
+    /**
+     * 插入
+     * @param $fileNameDO
+     * @return
+     */
+    Integer insert($FileNameDO $fileNameDO);
+
+    /**
+     * 按条件更新
+     * @param $FileNameDO
+     * @return
+     */
+    Integer updateByCondition($FileNameDO $fileNameDO);
+
+    /**
+     * 按ID更新
+     * @param id
+     * @return
+     */
+    Integer updateById($DataType id);
+
+    /**
+     * 按条件查询
+     * @param $FileNameQuery
+     * @return
+     */
+    List<$FileName> queryByCondition($FileNameQuery $fileNameQuery);
+
+    /**
+     * 按ID查询
+     * @param id
+     * @return
+     */
+    $FileName queryById($DataType id);
+
+    /**
+     * 按条件删除
+     * @param $FileNameDO
+     * @return
+     */
+    Integer deleteByCondition($FileNameDO $fileNameDO);
+
+    /**
+     * 按ID删除
+     * @param id
+     * @return
+     */
+    Integer deleteById($DataType id);
+}

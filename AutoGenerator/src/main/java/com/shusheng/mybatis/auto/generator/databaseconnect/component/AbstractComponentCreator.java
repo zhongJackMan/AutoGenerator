@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,7 +47,7 @@ public abstract class AbstractComponentCreator {
      * @param tableInfoDTO
      * @return
      */
-    protected abstract Map<String, String> getInterfaceTargetMap(String fileName, TableInfoDTO tableInfoDTO);
+    protected abstract Map<String, String> getInterfaceTargetMap(String fileName, TableInfoDTO tableInfoDTO) throws Exception;
 
     /**
      * 获取实习类文件的后缀
@@ -77,6 +78,18 @@ public abstract class AbstractComponentCreator {
         return true;
     }
 
+    /**
+     * 获取XML模板路径
+     * @return
+     */
+    protected abstract String getXMLTemplatePath();
+
+    /**
+     * 获取表字段信息
+     * @return
+     */
+    protected abstract List<TableInfoDTO>  getTableInfoDTOs();
+
     protected boolean createComponent(final File parentFile, final String tableName, final TableInfoDTO tableInfoDTO) {
         try {
             String fileName = mysqlDataTypeTransferComponent.getClassName(tableName);
@@ -89,7 +102,7 @@ public abstract class AbstractComponentCreator {
             /*
              * 创建实现类
              */
-            createInterface(fileName, directoryPath + "/impl", tableInfoDTO);
+            createImplements(fileName, directoryPath + "/impl", tableInfoDTO);
 
         }catch(Exception e) {
             logger.error(e.getMessage(), e);
@@ -111,33 +124,45 @@ public abstract class AbstractComponentCreator {
         String implementsPath = directoryPath + "/" + fileName + getImplementsEndSuffix();
         File implementsFile = fileComponent.createFile(implementsPath);
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(implementsFile), "UTF-8");
-
+        writeToImplementsFile(fileName, writer, tableInfoDTO);
     }
 
     private void writeToInterfaceFile(final String fileName, final OutputStreamWriter writer,
                                       final TableInfoDTO tableInfoDTO) throws Exception {
         BufferedReader reader = getBufferedReader(getInterfaceResourcePath());
-        String line = null;
         Map<String, String> targetMap = getInterfaceTargetMap(fileName, tableInfoDTO);
+        writeToFile(writer, reader, targetMap);
+    }
+
+    private void writeToImplementsFile(final String fileName, final OutputStreamWriter writer,
+                                       final TableInfoDTO tableInfoDTO) throws Exception {
+        if(isWriteToJAVA()) {
+            BufferedReader reader = getBufferedReader(getImplementsResourcePath());
+            Map<String, String> targetMap = getImplementsTargetMap(fileName, tableInfoDTO);
+            writeToFile(writer, reader, targetMap);
+            return;
+        }
+        writeToXMLFile(fileName, writer);
+    }
+
+    private void writeToXMLFile(final String fileName, final OutputStreamWriter writer) throws Exception {
+        BufferedReader reader = getBufferedReader(getXMLTemplatePath());
+
+    }
+
+    private void writeToFile(final OutputStreamWriter writer, final BufferedReader reader,
+                             final Map<String, String> targetMap) throws Exception {
+        String line = null;
+        Iterator<Map.Entry<String, String>> iterator = targetMap.entrySet().iterator();
         while(null != (line = reader.readLine())) {
-            Iterator<Map.Entry<String, String>> iterator = targetMap.entrySet().iterator();
             while(iterator.hasNext()) {
                 Map.Entry<String, String> entry = iterator.next();
-                if(line.contains(entry.getKey())) {
-                    fileComponent.replaceTarget(entry.getKey(), entry.getValue(), line);
-                }
+                fileComponent.replaceTarget(entry.getKey(), entry.getValue(), line);
             }
             writer.write(line);
             writer.flush();
         }
         writer.close();
-    }
-
-    private void writeToImplementsFile(final String fileName, final OutputStreamWriter writer,
-                                       final TableInfoDTO tableInfoDTO) throws Exception {
-        BufferedReader reader = getBufferedReader(getImplementsResourcePath());
-        Map<String, String> targetMap = getImplementsTargetMap(fileName, tableInfoDTO);
-
     }
 
     private BufferedReader getBufferedReader(final String resourcePath) throws Exception {
