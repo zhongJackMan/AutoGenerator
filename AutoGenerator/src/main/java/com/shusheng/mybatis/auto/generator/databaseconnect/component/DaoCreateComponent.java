@@ -4,7 +4,9 @@ import com.shusheng.mybatis.auto.generator.databaseconnect.modal.TableInfoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,6 +16,16 @@ import java.util.Map;
  */
 @Component
 public class DaoCreateComponent extends AbstractComponentCreator {
+
+    private final static ThreadLocal<List<TableInfoDTO>> localList = new ThreadLocal<>();
+
+    public boolean createDaoFile(final File parenFile, final String tableName,
+                                 final TableInfoDTO tableInfoDTO, final List<TableInfoDTO> tableInfoDTOS) {
+        localList.set(tableInfoDTOS);
+        this.createComponent(parenFile, tableName, tableInfoDTO);
+        return true;
+    }
+
     @Autowired
     private MysqlDataTypeTransferComponent mysqlDataTypeTransferComponent;
 
@@ -76,7 +88,13 @@ public class DaoCreateComponent extends AbstractComponentCreator {
     }
 
     @Override
+    protected List<TableInfoDTO> getTableInfoDTOs() {
+        return localList.get();
+    }
+
+    @Override
     protected boolean isWriteToJAVA() {
         return false;
     }
+
 }

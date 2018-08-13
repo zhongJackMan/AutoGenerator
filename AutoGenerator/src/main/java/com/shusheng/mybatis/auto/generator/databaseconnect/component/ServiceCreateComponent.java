@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -82,6 +83,11 @@ public class ServiceCreateComponent extends AbstractComponentCreator {
 
     @Override
     protected String getXMLTemplatePath() {
+        return null;
+    }
+
+    @Override
+    protected List<TableInfoDTO> getTableInfoDTOs() {
         return null;
     }
 
