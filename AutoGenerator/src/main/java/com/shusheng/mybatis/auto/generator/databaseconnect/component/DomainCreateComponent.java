@@ -32,7 +32,8 @@ public class DomainCreateComponent {
             String domainPath = parentFile.getAbsolutePath() + DOMAIN_PATH;
             File domainFile = fileComponent.mkdir(domainPath);
             String filename = mysqlDataTypeTransferComponent.getClassName(tableName);
-            File DOFile = fileComponent.createFile(domainFile.getAbsolutePath() + "/" +  filename + "DO" + ".java");
+            String commonFileName = domainFile.getAbsolutePath() + "/" + filename;
+            File DOFile = fileComponent.createFile(commonFileName + "DO.java");
             writer = new OutputStreamWriter(new FileOutputStream(DOFile), "UTF-8");
             /*
              * tempDO
@@ -41,24 +42,32 @@ public class DomainCreateComponent {
             /*
              * tempDTO
              */
-            File DTOFile = fileComponent.createFile(domainFile.getAbsolutePath() + "/" + filename + "DTO" + ".java");
+            File DTOFile = fileComponent.createFile(commonFileName + "DTO.java");
             writer = new OutputStreamWriter(new FileOutputStream(DTOFile), "UTF-8");
             this.writeFileTemplate(filename, tableInfoDTOS, "DTO", writer);
             /*
              * temp
              */
-            File tempFile = fileComponent.createFile(domainFile.getAbsolutePath() + "/" + filename + ".java");
+            File tempFile = fileComponent.createFile(commonFileName + ".java");
             writer = new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8");
             this.writeFileTemplate(filename, tableInfoDTOS, "", writer);
+            /*
+             * query
+             */
+            File queryFile = fileComponent.createFile(commonFileName + "Query.java");
+            writer = new OutputStreamWriter(new FileOutputStream(queryFile), "UTF-8");
+            getQueryDTO(tableInfoDTOS);
+            this.writeFileTemplate(filename, tableInfoDTOS, "Query", writer);
 
-        } catch (Exception e) {
+        }catch(Exception e) {
             logger.error(e.getMessage(), e);
         }finally {
             try {
                 if(null != writer) {
                     writer.close();
                 }
-            }catch (Exception e){}
+            }catch(Exception e) {
+            }
         }
         return true;
     }
@@ -93,40 +102,66 @@ public class DomainCreateComponent {
          *  }
          *
          */
+        String gapTab = "    ";
+        String lineSeparator = FileComponent.LINE_SEPARATOR;
+
         StringBuilder tempStr = new StringBuilder();
         StringBuilder getterStr = new StringBuilder();
         tempStr.append("package;");
-        tempStr.append(FileComponent.LINE_SEPARATOR);
+        tempStr.append(lineSeparator);
         tempStr.append("public class ").append(fileName).append(suffix).append(" {");
-        for (TableInfoDTO dto : tableInfoDTOS) {
-            tempStr.append(FileComponent.LINE_SEPARATOR);
+        for(TableInfoDTO dto : tableInfoDTOS) {
+            tempStr.append(lineSeparator);
             /*注释*/
-            tempStr.append("/**").append(FileComponent.LINE_SEPARATOR)
-                    .append(" *").append(FileComponent.LINE_SEPARATOR)
-                    .append(" * ").append(dto.getColumnComment())
-                    .append(" */").append(FileComponent.LINE_SEPARATOR);
+            tempStr.append(gapTab).append("/**").append(lineSeparator)
+                    .append(gapTab).append(" *").append(lineSeparator)
+                    .append(gapTab).append(" * ").append(dto.getColumnComment())
+                    .append(gapTab).append(" */").append(lineSeparator);
             /*属性*/
             String dataType = mysqlDataTypeTransferComponent.transfer(dto.getDataType().toLowerCase());
             String column = mysqlDataTypeTransferComponent.getFiledName(dto.getColumnName());
-            tempStr.append("private ").append(dataType)
-                    .append(" ").append(column).append(";").append(FileComponent.LINE_SEPARATOR);
+            tempStr.append(gapTab).append("private ").append(dataType)
+                    .append(" ").append(column).append(";").append(lineSeparator);
             StringBuilder upColumn = new StringBuilder(column.toUpperCase()
                     .substring(0, 1));
             upColumn.append(column.substring(1));
             /*getter & setter*/
-            getterStr.append(FileComponent.LINE_SEPARATOR).append("public ").append(dataType)
-                    .append(" get").append(upColumn).append("() {").append(FileComponent.LINE_SEPARATOR)
-                    .append("return ").append(column).append(";").append(FileComponent.LINE_SEPARATOR).append("}")
-                    .append(FileComponent.LINE_SEPARATOR).append(FileComponent.LINE_SEPARATOR);
-            getterStr.append("public void set").append(upColumn).append("(").append(dataType)
-                    .append(" ").append(column).append(" ) {").append(FileComponent.LINE_SEPARATOR).append("this.")
-                    .append(column).append(" = ").append(column).append(";").append(FileComponent.LINE_SEPARATOR)
-                    .append("}").append(FileComponent.LINE_SEPARATOR);
+            getterStr.append(lineSeparator)
+                    .append(gapTab).append("public ").append(dataType).append(" get")
+                    .append(upColumn).append("() {").append(lineSeparator)
+                    .append(gapTab).append(gapTab).append("return ").append(column).append(";").append(lineSeparator)
+                    .append("}").append(lineSeparator).append(lineSeparator);
+            getterStr.append(gapTab).append("public void set").append(upColumn).append("(").append(dataType)
+                    .append(" ").append(column).append(" ) {").append(lineSeparator)
+                    .append(gapTab).append(gapTab).append("this.")
+                    .append(column).append(" = ").append(column).append(";").append(lineSeparator)
+                    .append("}").append(lineSeparator);
         }
-        getterStr.append(FileComponent.LINE_SEPARATOR).append("}");
+        getterStr.append(lineSeparator).append("}");
         writer.write(tempStr.toString());
         writer.write(getterStr.toString());
         writer.flush();
+    }
+
+    /**
+     * 设置查询参数
+     * @param tableInfoDTOS
+     */
+    private void getQueryDTO(final List<TableInfoDTO> tableInfoDTOS) {
+        TableInfoDTO queryDTO = new TableInfoDTO();
+        queryDTO.setColumnComment("每页查询条数").setColumnName("pageSize").setDataType("int");
+        tableInfoDTOS.add(queryDTO);
+        queryDTO = new TableInfoDTO();
+        queryDTO.setColumnName("pageNo").setDataType("int").setColumnComment("查询分页参数");
+        tableInfoDTOS.add(queryDTO);
+        queryDTO.setColumnName("egtCreateTime").setDataType("datetime").setColumnComment("create_time >= egtCreateTime");
+        tableInfoDTOS.add(queryDTO);
+        queryDTO.setColumnName("eltCreateTime").setDataType("datetime").setColumnComment("create_time <= eltCreateTime");
+        tableInfoDTOS.add(queryDTO);
+        queryDTO.setColumnName("ltCreateTime").setDataType("datetime").setColumnComment("create_time < ltCreateTime");
+        tableInfoDTOS.add(queryDTO);
+        queryDTO.setColumnName("gtCreateTime").setDataType("datetime").setColumnComment("create_time > gtCreateTime");
+        tableInfoDTOS.add(queryDTO);
     }
 
 }

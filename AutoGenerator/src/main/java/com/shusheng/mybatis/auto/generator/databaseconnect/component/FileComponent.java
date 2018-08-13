@@ -46,4 +46,16 @@ public class FileComponent {
         file.mkdirs();
         return file;
     }
+
+    /**
+     * 替换目标字符串
+     * @param target
+     * @param source
+     * @param line
+     */
+    public void replaceTarget(final String target, final String source, final String line) {
+        if(line.contains(target)) {
+            line.replace(target, source);
+        }
+    }
 }

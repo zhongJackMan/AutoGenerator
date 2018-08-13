@@ -35,21 +35,6 @@ public class DownloadFileComponent {
     @Autowired
     private DomainCreateComponent domainCreateComponent;
 
-
-    private final static ThreadPoolExecutor tpe;
-    static {
-        tpe = new ThreadPoolExecutor(5, 10, 1L, TimeUnit.SECONDS,
-                new LinkedBlockingDeque<Runnable>(1000), new RejectedExecutionHandler() {
-            @Override
-            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-                try {
-                    tpe.getQueue().put(r);
-                } catch (InterruptedException e) {
-                }
-            }
-        });
-        tpe.allowCoreThreadTimeOut(true);
-    }
     /**
      * 下载文件
      * @param databaseDTO
@@ -67,14 +52,14 @@ public class DownloadFileComponent {
         StringBuilder parentFilePath = new StringBuilder(LOCAL_PATH);
         parentFilePath.append("/").append(databaseDTO.getTableName());
         final File parentFile = fileComponent.mkdir(parentFilePath.toString());
-        ExecutorCompletionService<Boolean> es = new ExecutorCompletionService<>(tpe);
         domainCreateComponent.createDomainFile(tableInfoDTOS, parentFile, databaseDTO.getTableName());
-//        es.submit(new Callable<Boolean>() {
-//            @Override
-//            public Boolean call() throws Exception {
-//                return domainCreateComponent.createDomainFile(tableInfoDTOS, parentFile, databaseDTO.getTableName());
-//            }
-//        });
     }
+
+	public static void main(String[] args) {
+		String path = new DownloadFileComponent().getClass().getClassLoader()
+						.getResource("java_template/DO.text").getPath();
+		System.out.println(path);
+
+	}
 
 }

@@ -1,0 +1,52 @@
+package;
+
+public interface $FileNameService {
+    /**
+     * 插入
+     * @param $fileNameDTO
+     * @return
+     */
+    Integer insert($FileNameDTO $fileNameDTO);
+
+    /**
+     * 按条件更新
+     * @param $FileNameDTO
+     * @return
+     */
+    Integer updateByCondition($FileNameDTO $FileNameDTO);
+
+    /**
+     * 按ID更新
+     * @param id
+     * @return
+     */
+    Integer updateById($DataType id);
+
+    /**
+     * 按条件查询
+     * @param $FileNameQuery
+     * @return
+     */
+    List<$FileNameDTO> queryByCondition($FileNameQuery $fileNameQuery);
+
+    /**
+     * 按ID查询
+     * @param id
+     * @return
+     */
+    $FileNameDTO queryById($DataType id);
+
+    /**
+     * 按条件删除
+     * @param $FileNameDTO
+     * @return
+     */
+    Integer deleteByCondition($FileNameDTO $FileNameDTO);
+
+    /**
+     * 按ID删除
+     * @param id
+     * @return
+     */
+    Integer deleteById($DataType id);
+}
