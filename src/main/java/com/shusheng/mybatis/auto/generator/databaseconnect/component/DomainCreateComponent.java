@@ -119,6 +119,9 @@ public class DomainCreateComponent {
                     .append(gapTab).append(" */").append(lineSeparator);
             /*属性*/
             String dataType = mysqlDataTypeTransferComponent.transfer(dto.getDataType().toLowerCase());
+            if(null == dataType) {
+                dataType = dto.getDataType();
+            }
             String column = mysqlDataTypeTransferComponent.getFiledName(dto.getColumnName());
             tempStr.append(gapTab).append("private ").append(dataType)
                     .append(" ").append(column).append(";").append(lineSeparator);
@@ -178,19 +181,30 @@ public class DomainCreateComponent {
         TableInfoDTO queryDTO = new TableInfoDTO();
         queryDTO.setColumnComment("每页查询条数").setColumnName("pageSize").setDataType("int");
         queryDTOs.add(queryDTO);
-        queryDTO = new TableInfoDTO();
-        queryDTO.setColumnName("pageNo").setDataType("int").setColumnComment("查询分页参数");
-        queryDTOs.add(queryDTO);
-        queryDTO.setColumnName("egtCreateTime").setDataType("datetime").setColumnComment("create_time >= egtCreateTime");
-        queryDTOs.add(queryDTO);
-        queryDTO.setColumnName("eltCreateTime").setDataType("datetime").setColumnComment("create_time <= eltCreateTime");
-        queryDTOs.add(queryDTO);
-        queryDTO.setColumnName("ltCreateTime").setDataType("datetime").setColumnComment("create_time < ltCreateTime");
-        queryDTOs.add(queryDTO);
-        queryDTO.setColumnName("gtCreateTime").setDataType("datetime").setColumnComment("create_time > gtCreateTime");
-        queryDTOs.add(queryDTO);
-        queryDTO.setColumnName("orderBy").setColumnComment("List<OrderBy>").setColumnComment("排序字段集合");
-        queryDTOs.add(queryDTO);
+
+        TableInfoDTO pageNo = new TableInfoDTO();
+        pageNo.setColumnName("pageNo").setDataType("int").setColumnComment("查询分页参数");
+        queryDTOs.add(pageNo);
+
+        TableInfoDTO egtCreateTime = new TableInfoDTO();
+        egtCreateTime.setColumnName("egtCreateTime").setDataType("datetime").setColumnComment("create_time >= egtCreateTime");
+        queryDTOs.add(egtCreateTime);
+
+        TableInfoDTO eltCreateTime = new TableInfoDTO();
+        eltCreateTime.setColumnName("eltCreateTime").setDataType("datetime").setColumnComment("create_time <= eltCreateTime");
+        queryDTOs.add(eltCreateTime);
+
+        TableInfoDTO ltCreateTime = new TableInfoDTO();
+        ltCreateTime.setColumnName("ltCreateTime").setDataType("datetime").setColumnComment("create_time < ltCreateTime");
+        queryDTOs.add(ltCreateTime);
+
+        TableInfoDTO gtCreateTime = new TableInfoDTO();
+        gtCreateTime.setColumnName("gtCreateTime").setDataType("datetime").setColumnComment("create_time > gtCreateTime");
+        queryDTOs.add(gtCreateTime);
+
+        TableInfoDTO orderBy = new TableInfoDTO();
+        orderBy.setColumnName("orderBy").setDataType("List<OrderBy>").setColumnComment("排序字段集合");
+        queryDTOs.add(orderBy);
         return queryDTOs;
     }
 

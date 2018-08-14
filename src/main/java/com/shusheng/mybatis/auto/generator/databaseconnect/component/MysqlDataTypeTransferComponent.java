@@ -38,7 +38,7 @@ public class MysqlDataTypeTransferComponent {
             case "boolean":
                 return "Boolean";
             default:
-                return mysqlDataType;
+                return null;
         }
     }
 

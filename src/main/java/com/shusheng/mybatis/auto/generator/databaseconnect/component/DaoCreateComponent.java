@@ -52,6 +52,7 @@ public class DaoCreateComponent extends AbstractComponentCreator {
     protected Map<String, String> getInterfaceTargetMap(String fileName, TableInfoDTO tableInfoDTO) throws Exception {
         Map<String, String> targetMap = new HashMap<>();
         String className = fileName + "Dao";
+        targetMap.put("$FileName", className);
         targetMap.put("$FileNameDao", className);
 
         String param = fileName.toLowerCase().substring(0, 1) + fileName.substring(1);
@@ -109,6 +110,7 @@ public class DaoCreateComponent extends AbstractComponentCreator {
             getSelectWhere(selectWhereStr, column, property);
             getUpdateStr(updateStr, column, property, isLast);
             getInsertValueStr(insertStr, property, isLast);
+            i++;
         }
         targetMap.put("$mapStr", mapStr.toString());
         targetMap.put("$sqlStr", baseSqlStr.toString());
