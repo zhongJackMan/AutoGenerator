@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 生活愉快 多撩妹 -->
+<mapper namespace="$nameSpace">
+
+    <!-- result map -->
+    <resultMap id="BaseResultMap" type="$FileName">
+        $mapStr
+    </resultMap>
+
+    <!-- select columns -->
+    <sql id="Base_Column_List">
+        $sqlStr
+    </sql>
+
+    <sql id="SELECT_WHERE_COLUMNS">
+        $selectWhereStr
+    </sql>
+
+    <sql id="UPDATE_COLUMNS">
+        $updateColumnsStr
+    </sql>
+
+    <sql id="SELECT_LIMIE">
+        <if test="pageNo != null and pageSize != null">
+            LIMIT #{pageNo} , #{pageSize}
+        </if>
+    </sql>
+
+    <sql id="SELECT_ORDERBY">
+        <if test="orderby != null">
+            <foreach collection="orderby" index="i" item="item" open="order by" separator=",">
+                ${item.columnName} ${item.type}
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="queryById" parameterType="$dataType" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from
+        $tableName
+        where
+        id = #{id}
+    </select>
+
+    <select id="queryByCondition" parameterType="$FileNameQuery" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from $tableName
+        <where>
+            <trim prefix="" prefixOverrides="and" suffix="">
+                <include refid="SELECT_WHERE_COLUMNS"/>
+            </trim>
+        </where>
+        <include refid="SELECT_ORDERBY" />
+        <include refid="SELECT_LIMIE" />
+    </select>
+
+    <insert id="insert" parameterType="$FileNameDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        $tableName
+        (
+          <include refid="Base_Column_List"/>
+        )VALUES(
+          $insertValueStr
+        )
+    </insert>
+
+    <update id="updateById" parameterType="$dataType">
+        update $tableName
+        <set>
+            <include refid="UPDATE_COLUMNS"></include>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateByCondition" parameterType="$FileNameDO">
+        update $tableName
+        <set>
+            <include refid="UPDATE_COLUMNS"></include>
+        </set>
+        <where>
+            <trim prefix="" prefixOverrides="and" suffix="">
+                <include refid="SELECT_WHERE_COLUMNS"/>
+            </trim>
+        </where>
+    </update>
+
+    <delete id="deleteById" parameterType="$dataType">
+        delete from $tableName
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteByCondition" parameterType="$FileNameDO">
+        delete from $tableName
+        <where>
+            <trim prefix="" prefixOverrides="and" suffix="">
+                <include refid="SELECT_WHERE_COLUMNS"/>
+            </trim>
+        </where>
+    </delete>
+
+</mapper>

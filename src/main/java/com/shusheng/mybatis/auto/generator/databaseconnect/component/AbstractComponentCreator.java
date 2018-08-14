@@ -22,8 +22,10 @@ public abstract class AbstractComponentCreator {
     private MysqlDataTypeTransferComponent mysqlDataTypeTransferComponent;
     @Autowired
     private FileComponent fileComponent;
+
     /**
      * 获取文件目录
+     *
      * @return
      */
     protected abstract String getBaseDirectory();
@@ -31,18 +33,21 @@ public abstract class AbstractComponentCreator {
     /**
      * 获取接口文件后缀
      * Service.java
+     *
      * @return
      */
     protected abstract String getInterfaceEndSuffix();
 
     /**
      * 获取接口模板文件路径
+     *
      * @return
      */
     protected abstract String getInterfaceResourcePath();
 
     /**
      * 获取接口文件替换关键字
+     *
      * @param fileName
      * @param tableInfoDTO
      * @return
@@ -51,44 +56,26 @@ public abstract class AbstractComponentCreator {
 
     /**
      * 获取实习类文件的后缀
+     *
      * @return
      */
     protected abstract String getImplementsEndSuffix();
 
     /**
      * 获取实现类模板文件路径
+     *
      * @return
      */
     protected abstract String getImplementsResourcePath();
 
     /**
      * 获取实现类文件替换关键字
+     *
      * @param fileName
      * @param tableInfoDTO
      * @return
      */
-    protected abstract Map<String, String> getImplementsTargetMap(String fileName, TableInfoDTO tableInfoDTO);
-
-    /**
-     * 是否写入java文件
-     * 默认为真
-     * @return
-     */
-    protected boolean isWriteToJAVA() {
-        return true;
-    }
-
-    /**
-     * 获取XML模板路径
-     * @return
-     */
-    protected abstract String getXMLTemplatePath();
-
-    /**
-     * 获取表字段信息
-     * @return
-     */
-    protected abstract List<TableInfoDTO>  getTableInfoDTOs();
+    protected abstract Map<String, String> getImplementsTargetMap(String fileName, TableInfoDTO tableInfoDTO) throws Exception;
 
     protected boolean createComponent(final File parentFile, final String tableName, final TableInfoDTO tableInfoDTO) {
         try {
@@ -120,7 +107,7 @@ public abstract class AbstractComponentCreator {
     }
 
     private void createImplements(final String fileName, final String directoryPath, final TableInfoDTO tableInfoDTO)
-        throws Exception {
+            throws Exception {
         String implementsPath = directoryPath + "/" + fileName + getImplementsEndSuffix();
         File implementsFile = fileComponent.createFile(implementsPath);
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(implementsFile), "UTF-8");
@@ -136,18 +123,9 @@ public abstract class AbstractComponentCreator {
 
     private void writeToImplementsFile(final String fileName, final OutputStreamWriter writer,
                                        final TableInfoDTO tableInfoDTO) throws Exception {
-        if(isWriteToJAVA()) {
-            BufferedReader reader = getBufferedReader(getImplementsResourcePath());
-            Map<String, String> targetMap = getImplementsTargetMap(fileName, tableInfoDTO);
-            writeToFile(writer, reader, targetMap);
-            return;
-        }
-        writeToXMLFile(fileName, writer);
-    }
-
-    private void writeToXMLFile(final String fileName, final OutputStreamWriter writer) throws Exception {
-        BufferedReader reader = getBufferedReader(getXMLTemplatePath());
-
+        BufferedReader reader = getBufferedReader(getImplementsResourcePath());
+        Map<String, String> targetMap = getImplementsTargetMap(fileName, tableInfoDTO);
+        writeToFile(writer, reader, targetMap);
     }
 
     private void writeToFile(final OutputStreamWriter writer, final BufferedReader reader,

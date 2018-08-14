@@ -86,9 +86,4 @@ public class ServiceCreateComponent extends AbstractComponentCreator {
         return null;
     }
 
-    @Override
-    protected List<TableInfoDTO> getTableInfoDTOs() {
-        return null;
-    }
-
 }

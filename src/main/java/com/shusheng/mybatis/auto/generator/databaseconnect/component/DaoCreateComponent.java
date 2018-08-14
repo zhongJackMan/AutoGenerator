@@ -18,16 +18,19 @@ import java.util.Map;
 public class DaoCreateComponent extends AbstractComponentCreator {
 
     private final static ThreadLocal<List<TableInfoDTO>> localList = new ThreadLocal<>();
+    private final static ThreadLocal<String> localTableName = new ThreadLocal<>();
+    private final static String GAP_TAB = "\t";
+    private final static String LINE_SEPARATOR = FileComponent.LINE_SEPARATOR;
+    @Autowired
+    private MysqlDataTypeTransferComponent mysqlDataTypeTransferComponent;
 
     public boolean createDaoFile(final File parenFile, final String tableName,
                                  final TableInfoDTO tableInfoDTO, final List<TableInfoDTO> tableInfoDTOS) {
         localList.set(tableInfoDTOS);
+        localTableName.set(tableName);
         this.createComponent(parenFile, tableName, tableInfoDTO);
         return true;
     }
-
-    @Autowired
-    private MysqlDataTypeTransferComponent mysqlDataTypeTransferComponent;
 
     @Override
     protected String getBaseDirectory() {
@@ -69,32 +72,77 @@ public class DaoCreateComponent extends AbstractComponentCreator {
 
     @Override
     protected String getImplementsEndSuffix() {
-        return null;
+        return ".xml";
     }
 
     @Override
     protected String getImplementsResourcePath() {
-        return null;
+        return "java_template/MybatisXML.xml";
     }
 
     @Override
-    protected Map<String, String> getImplementsTargetMap(String fileName, TableInfoDTO tableInfoDTO) {
-        return null;
+    protected Map<String, String> getImplementsTargetMap(String fileName, TableInfoDTO tableInfoDTO) throws Exception {
+        Map<String, String> targetMap = new HashMap<>();
+        List<TableInfoDTO> list = localList.get();
+        targetMap.put("$nameSpace", "");
+        targetMap.put("$tableName", localTableName.get());
+        targetMap.put("$dataType", mysqlDataTypeTransferComponent.transfer(tableInfoDTO.getDataType()));
+        targetMap.put("$FileNameQuery", fileName + "Query");
+        targetMap.put("$FileNameDO", fileName + "DO");
+        StringBuilder mapStr = new StringBuilder();
+        StringBuilder baseSqlStr = new StringBuilder();
+        StringBuilder selectWhereStr = new StringBuilder();
+        StringBuilder updateStr = new StringBuilder();
+        StringBuilder insertStr = new StringBuilder();
+        for(TableInfoDTO dto : list) {
+            String column = dto.getColumnName();
+            String property = mysqlDataTypeTransferComponent.getFiledName(column);
+            getMapStr(mapStr, column, property);
+            getBaseSql(baseSqlStr, column);
+            getSelectWhere(selectWhereStr, column, property);
+            getUpdateStr(updateStr, column, property);
+            getInsertValueStr(insertStr, property);
+        }
+        targetMap.put("$mapStr", mapStr.toString());
+        targetMap.put("$sqlStr", baseSqlStr.toString());
+        targetMap.put("$selectWhereStr", selectWhereStr.toString());
+        targetMap.put("$updateColumnsStr", updateStr.toString());
+        targetMap.put("$insertValueStr", insertStr.toString());
+        return targetMap;
     }
 
-    @Override
-    protected String getXMLTemplatePath() {
-        return null;
+    private void getMapStr(StringBuilder str, String column, String property) {
+        str.append(GAP_TAB).append(GAP_TAB)
+                .append("<result column = \"").append(column).append("\" property = \"")
+                .append(property).append("\" />")
+                .append(LINE_SEPARATOR);
     }
 
-    @Override
-    protected List<TableInfoDTO> getTableInfoDTOs() {
-        return localList.get();
+    private void getBaseSql(StringBuilder str, String column) {
+        str.append(GAP_TAB).append(GAP_TAB).append(GAP_TAB)
+                .append(column).append(",").append(LINE_SEPARATOR);
     }
 
-    @Override
-    protected boolean isWriteToJAVA() {
-        return false;
+    private void getSelectWhere(StringBuilder str, String column, String property) {
+        str.append(GAP_TAB).append(GAP_TAB)
+                .append("<if test = \"").append(property).append(" != null and ")
+                .append(property).append(" != ''\">").append(LINE_SEPARATOR)
+                .append(GAP_TAB).append(GAP_TAB).append(GAP_TAB)
+                .append("and ").append(column).append(" = ").append("#{").append(property).append("}")
+                .append(GAP_TAB).append(GAP_TAB).append("</if>").append(LINE_SEPARATOR);
     }
 
+    private void getUpdateStr(StringBuilder str, String column, String property) {
+        str.append(GAP_TAB).append(GAP_TAB)
+                .append("<if test = \"").append(property).append(" != null and ")
+                .append(property).append(" != ''\">").append(LINE_SEPARATOR)
+                .append(GAP_TAB).append(GAP_TAB).append(GAP_TAB)
+                .append(column).append(" = ").append(property).append(",").append(LINE_SEPARATOR)
+                .append(GAP_TAB).append(GAP_TAB).append("</if>").append(LINE_SEPARATOR);
+    }
+
+    private void getInsertValueStr(StringBuilder str, String property) {
+        str.append(GAP_TAB).append(GAP_TAB).append(GAP_TAB)
+                .append(property).append(",").append(LINE_SEPARATOR);
+    }
 }
