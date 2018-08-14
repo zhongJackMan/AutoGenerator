@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -58,16 +56,15 @@ public class DomainCreateComponent {
             writer = new OutputStreamWriter(new FileOutputStream(queryFile), "UTF-8");
             getQueryDTO(tableInfoDTOS);
             this.writeFileTemplate(filename, tableInfoDTOS, "Query", writer);
+            /*
+             * orderBy
+             */
+            File orderByFile = fileComponent.createFile("OrderBy.java");
+            writer = new OutputStreamWriter(new FileOutputStream(orderByFile), "UTF-8");
+            this.writeToOrderBy(writer);
 
         }catch(Exception e) {
             logger.error(e.getMessage(), e);
-        }finally {
-            try {
-                if(null != writer) {
-                    writer.close();
-                }
-            }catch(Exception e) {
-            }
         }
         return true;
     }
@@ -141,6 +138,26 @@ public class DomainCreateComponent {
         writer.write(tempStr.toString());
         writer.write(getterStr.toString());
         writer.flush();
+        writer.close();
+    }
+
+    /**
+     * 写入OrderBy.java
+     * @param writer
+     * @throws Exception
+     */
+    private void writeToOrderBy(OutputStreamWriter writer) throws Exception {
+        String templatePath = this.getClass().getClassLoader()
+                .getResource("java_template/OrderBy.txt").getPath();
+        File file = fileComponent.createFile(templatePath);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(
+                new FileInputStream(file), "UTF-8"));
+        String line = null;
+        while(null != (line = reader.readLine())) {
+            writer.write(line);
+            writer.flush();
+        }
+        writer.close();
     }
 
     /**
@@ -161,6 +178,8 @@ public class DomainCreateComponent {
         queryDTO.setColumnName("ltCreateTime").setDataType("datetime").setColumnComment("create_time < ltCreateTime");
         tableInfoDTOS.add(queryDTO);
         queryDTO.setColumnName("gtCreateTime").setDataType("datetime").setColumnComment("create_time > gtCreateTime");
+        tableInfoDTOS.add(queryDTO);
+        queryDTO.setColumnName("orderBy").setColumnComment("List<OrderBy>").setColumnComment("排序字段集合");
         tableInfoDTOS.add(queryDTO);
     }
 
