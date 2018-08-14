@@ -131,13 +131,17 @@ public abstract class AbstractComponentCreator {
     private void writeToFile(final OutputStreamWriter writer, final BufferedReader reader,
                              final Map<String, String> targetMap) throws Exception {
         String line = null;
-        Iterator<Map.Entry<String, String>> iterator = targetMap.entrySet().iterator();
+
         while(null != (line = reader.readLine())) {
-            while(iterator.hasNext()) {
-                Map.Entry<String, String> entry = iterator.next();
-                fileComponent.replaceTarget(entry.getKey(), entry.getValue(), line);
+            if(line.contains("$")) {
+                Iterator<Map.Entry<String, String>> iterator = targetMap.entrySet().iterator();
+                while(iterator.hasNext()) {
+                    Map.Entry<String, String> entry = iterator.next();
+                    line = fileComponent.replaceTarget(entry.getKey(), entry.getValue(), line);
+                }
             }
             writer.write(line);
+            writer.write(FileComponent.LINE_SEPARATOR);
             writer.flush();
         }
         writer.close();
@@ -151,4 +155,15 @@ public abstract class AbstractComponentCreator {
         return reader;
     }
 
+
+    public static void main(String[] args) {
+        String line = "public class $FileName";
+        String target = "$FileName";
+        String source = "TestClass";
+        if(line.contains(target)) {
+            String temp = line.replace(target, source);
+            System.out.println(temp);
+        }
+        System.out.println(line);
+    }
 }

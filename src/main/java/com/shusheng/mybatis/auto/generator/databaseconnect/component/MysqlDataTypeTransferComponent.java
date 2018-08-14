@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MysqlDataTypeTransferComponent {
 
-    public String transfer(final String mysqlDataType) throws Exception {
+    public String transfer(final String mysqlDataType) {
 
         switch (mysqlDataType) {
             case "char":
@@ -26,7 +26,9 @@ public class MysqlDataTypeTransferComponent {
             case "double":
                 return "Double";
             case "bigint":
+                return "Long";
             case "numeric":
+            case "decimal":
                 return "BigDecimal";
             case "tinyint":
                 return "Byte";
@@ -36,7 +38,7 @@ public class MysqlDataTypeTransferComponent {
             case "boolean":
                 return "Boolean";
             default:
-                throw new Exception("unSupport dataType transfer");
+                return mysqlDataType;
         }
     }
 

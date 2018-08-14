@@ -53,9 +53,10 @@ public class FileComponent {
      * @param source
      * @param line
      */
-    public void replaceTarget(final String target, final String source, final String line) {
+    public String replaceTarget(final String target, final String source, final String line) {
         if(line.contains(target)) {
-            line.replace(target, source);
+            return line.replace(target, source);
         }
+        return line;
     }
 }

@@ -81,9 +81,4 @@ public class ServiceCreateComponent extends AbstractComponentCreator {
         return null;
     }
 
-    @Override
-    protected String getXMLTemplatePath() {
-        return null;
-    }
-
 }

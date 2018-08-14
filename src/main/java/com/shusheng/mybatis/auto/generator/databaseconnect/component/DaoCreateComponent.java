@@ -11,6 +11,7 @@ import java.util.Map;
 
 /**
  * Dao生成组件
+ *
  * @Author shusheng
  * @createTime 2018/8/13/ 下午11:16
  */
@@ -89,19 +90,25 @@ public class DaoCreateComponent extends AbstractComponentCreator {
         targetMap.put("$dataType", mysqlDataTypeTransferComponent.transfer(tableInfoDTO.getDataType()));
         targetMap.put("$FileNameQuery", fileName + "Query");
         targetMap.put("$FileNameDO", fileName + "DO");
+        targetMap.put("$FileName", fileName);
         StringBuilder mapStr = new StringBuilder();
         StringBuilder baseSqlStr = new StringBuilder();
         StringBuilder selectWhereStr = new StringBuilder();
         StringBuilder updateStr = new StringBuilder();
         StringBuilder insertStr = new StringBuilder();
+        boolean isLast = false;
+        int i = 1;
         for(TableInfoDTO dto : list) {
+            if(i == list.size()) {
+                isLast = true;
+            }
             String column = dto.getColumnName();
             String property = mysqlDataTypeTransferComponent.getFiledName(column);
             getMapStr(mapStr, column, property);
-            getBaseSql(baseSqlStr, column);
+            getBaseSql(baseSqlStr, column, isLast);
             getSelectWhere(selectWhereStr, column, property);
-            getUpdateStr(updateStr, column, property);
-            getInsertValueStr(insertStr, property);
+            getUpdateStr(updateStr, column, property, isLast);
+            getInsertValueStr(insertStr, property, isLast);
         }
         targetMap.put("$mapStr", mapStr.toString());
         targetMap.put("$sqlStr", baseSqlStr.toString());
@@ -118,9 +125,13 @@ public class DaoCreateComponent extends AbstractComponentCreator {
                 .append(LINE_SEPARATOR);
     }
 
-    private void getBaseSql(StringBuilder str, String column) {
+    private void getBaseSql(StringBuilder str, String column, boolean isLast) {
         str.append(GAP_TAB).append(GAP_TAB).append(GAP_TAB)
-                .append(column).append(",").append(LINE_SEPARATOR);
+                .append(column);
+        if(!isLast) {
+            str.append(",");
+        }
+        str.append(LINE_SEPARATOR);
     }
 
     private void getSelectWhere(StringBuilder str, String column, String property) {
@@ -129,20 +140,27 @@ public class DaoCreateComponent extends AbstractComponentCreator {
                 .append(property).append(" != ''\">").append(LINE_SEPARATOR)
                 .append(GAP_TAB).append(GAP_TAB).append(GAP_TAB)
                 .append("and ").append(column).append(" = ").append("#{").append(property).append("}")
-                .append(GAP_TAB).append(GAP_TAB).append("</if>").append(LINE_SEPARATOR);
+                .append(LINE_SEPARATOR).append(GAP_TAB).append(GAP_TAB).append("</if>").append(LINE_SEPARATOR);
     }
 
-    private void getUpdateStr(StringBuilder str, String column, String property) {
+    private void getUpdateStr(StringBuilder str, String column, String property, boolean isLast) {
         str.append(GAP_TAB).append(GAP_TAB)
                 .append("<if test = \"").append(property).append(" != null and ")
                 .append(property).append(" != ''\">").append(LINE_SEPARATOR)
                 .append(GAP_TAB).append(GAP_TAB).append(GAP_TAB)
-                .append(column).append(" = ").append(property).append(",").append(LINE_SEPARATOR)
-                .append(GAP_TAB).append(GAP_TAB).append("</if>").append(LINE_SEPARATOR);
+                .append(column).append(" = ").append("#{").append(property).append("}");
+        if(!isLast) {
+            str.append(",");
+        }
+        str.append(LINE_SEPARATOR).append(GAP_TAB).append(GAP_TAB).append("</if>").append(LINE_SEPARATOR);
     }
 
-    private void getInsertValueStr(StringBuilder str, String property) {
+    private void getInsertValueStr(StringBuilder str, String property, boolean isLast) {
         str.append(GAP_TAB).append(GAP_TAB).append(GAP_TAB)
-                .append(property).append(",").append(LINE_SEPARATOR);
+                .append("#{").append(property).append("}");
+        if(!isLast) {
+            str.append(",");
+        }
+        str.append(LINE_SEPARATOR);
     }
 }

@@ -54,11 +54,11 @@ public class GenerationModalController {
     public String testGenerator(HttpServletResponse response) {
         DatabaseDTO databaseDTO = new DatabaseDTO();
         databaseDTO.setDataBaseType(DatabaseTypeEnum.MYSQL.getCode());
-        databaseDTO.setUserName("jack_man");
-        databaseDTO.setPassword("123456");
-        databaseDTO.setTableName("sso_user_info");
-        databaseDTO.setTableSchema("SSO");
-        databaseDTO.setUrl("jdbc:mysql://mysql.linux.com/information_schema");
+        databaseDTO.setUserName("tbj");
+        databaseDTO.setPassword("tbj900900");
+        databaseDTO.setTableName("crs_share_201802");
+        databaseDTO.setTableSchema("crs");
+        databaseDTO.setUrl("jdbc:mysql://db.tbj.com/information_schema");
         try {
             downloadFileComponent.downloadFile(databaseDTO, response);
         }catch (Exception e){}

@@ -34,6 +34,10 @@ public class DownloadFileComponent {
     private FileComponent fileComponent;
     @Autowired
     private DomainCreateComponent domainCreateComponent;
+    @Autowired
+    private DaoCreateComponent daoCreateComponent;
+    @Autowired
+    private ServiceCreateComponent serviceCreateComponent;
 
     /**
      * 下载文件
@@ -53,6 +57,9 @@ public class DownloadFileComponent {
         parentFilePath.append("/").append(databaseDTO.getTableName());
         final File parentFile = fileComponent.mkdir(parentFilePath.toString());
         domainCreateComponent.createDomainFile(tableInfoDTOS, parentFile, databaseDTO.getTableName());
+        daoCreateComponent.createDaoFile(parentFile, databaseDTO.getTableName(),tableInfoDTOS.get(0),
+                tableInfoDTOS);
+        serviceCreateComponent.createService(parentFile, databaseDTO.getTableName(), tableInfoDTOS.get(0));
     }
 
 	public static void main(String[] args) {

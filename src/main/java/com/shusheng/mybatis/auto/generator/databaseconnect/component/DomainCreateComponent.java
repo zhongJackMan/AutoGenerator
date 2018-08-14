@@ -3,10 +3,13 @@ package com.shusheng.mybatis.auto.generator.databaseconnect.component;
 import com.shusheng.mybatis.auto.generator.databaseconnect.modal.TableInfoDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sun.tools.jconsole.Tab;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,12 +57,12 @@ public class DomainCreateComponent {
              */
             File queryFile = fileComponent.createFile(commonFileName + "Query.java");
             writer = new OutputStreamWriter(new FileOutputStream(queryFile), "UTF-8");
-            getQueryDTO(tableInfoDTOS);
-            this.writeFileTemplate(filename, tableInfoDTOS, "Query", writer);
+            List<TableInfoDTO> queryDTOs = getQueryDTO(tableInfoDTOS);
+            this.writeFileTemplate(filename, queryDTOs, "Query", writer);
             /*
              * orderBy
              */
-            File orderByFile = fileComponent.createFile("OrderBy.java");
+            File orderByFile = fileComponent.createFile(domainFile.getAbsolutePath() + "/OrderBy.java");
             writer = new OutputStreamWriter(new FileOutputStream(orderByFile), "UTF-8");
             this.writeToOrderBy(writer);
 
@@ -112,7 +115,7 @@ public class DomainCreateComponent {
             /*注释*/
             tempStr.append(gapTab).append("/**").append(lineSeparator)
                     .append(gapTab).append(" *").append(lineSeparator)
-                    .append(gapTab).append(" * ").append(dto.getColumnComment())
+                    .append(gapTab).append(" * ").append(dto.getColumnComment()).append(lineSeparator)
                     .append(gapTab).append(" */").append(lineSeparator);
             /*属性*/
             String dataType = mysqlDataTypeTransferComponent.transfer(dto.getDataType().toLowerCase());
@@ -127,12 +130,12 @@ public class DomainCreateComponent {
                     .append(gapTab).append("public ").append(dataType).append(" get")
                     .append(upColumn).append("() {").append(lineSeparator)
                     .append(gapTab).append(gapTab).append("return ").append(column).append(";").append(lineSeparator)
-                    .append("}").append(lineSeparator).append(lineSeparator);
+                    .append(gapTab).append("}").append(lineSeparator).append(lineSeparator);
             getterStr.append(gapTab).append("public void set").append(upColumn).append("(").append(dataType)
                     .append(" ").append(column).append(" ) {").append(lineSeparator)
                     .append(gapTab).append(gapTab).append("this.")
                     .append(column).append(" = ").append(column).append(";").append(lineSeparator)
-                    .append("}").append(lineSeparator);
+                    .append(gapTab).append("}").append(lineSeparator);
         }
         getterStr.append(lineSeparator).append("}");
         writer.write(tempStr.toString());
@@ -155,6 +158,7 @@ public class DomainCreateComponent {
         String line = null;
         while(null != (line = reader.readLine())) {
             writer.write(line);
+            writer.write(FileComponent.LINE_SEPARATOR);
             writer.flush();
         }
         writer.close();
@@ -164,23 +168,30 @@ public class DomainCreateComponent {
      * 设置查询参数
      * @param tableInfoDTOS
      */
-    private void getQueryDTO(final List<TableInfoDTO> tableInfoDTOS) {
+    private List<TableInfoDTO> getQueryDTO(final List<TableInfoDTO> tableInfoDTOS) {
+        List<TableInfoDTO> queryDTOs = new ArrayList<>(tableInfoDTOS.size());
+        for(TableInfoDTO dto : tableInfoDTOS) {
+            TableInfoDTO queryDTO = new TableInfoDTO();
+            BeanUtils.copyProperties(dto, queryDTO);
+            queryDTOs.add(queryDTO);
+        }
         TableInfoDTO queryDTO = new TableInfoDTO();
         queryDTO.setColumnComment("每页查询条数").setColumnName("pageSize").setDataType("int");
-        tableInfoDTOS.add(queryDTO);
+        queryDTOs.add(queryDTO);
         queryDTO = new TableInfoDTO();
         queryDTO.setColumnName("pageNo").setDataType("int").setColumnComment("查询分页参数");
-        tableInfoDTOS.add(queryDTO);
+        queryDTOs.add(queryDTO);
         queryDTO.setColumnName("egtCreateTime").setDataType("datetime").setColumnComment("create_time >= egtCreateTime");
-        tableInfoDTOS.add(queryDTO);
+        queryDTOs.add(queryDTO);
         queryDTO.setColumnName("eltCreateTime").setDataType("datetime").setColumnComment("create_time <= eltCreateTime");
-        tableInfoDTOS.add(queryDTO);
+        queryDTOs.add(queryDTO);
         queryDTO.setColumnName("ltCreateTime").setDataType("datetime").setColumnComment("create_time < ltCreateTime");
-        tableInfoDTOS.add(queryDTO);
+        queryDTOs.add(queryDTO);
         queryDTO.setColumnName("gtCreateTime").setDataType("datetime").setColumnComment("create_time > gtCreateTime");
-        tableInfoDTOS.add(queryDTO);
+        queryDTOs.add(queryDTO);
         queryDTO.setColumnName("orderBy").setColumnComment("List<OrderBy>").setColumnComment("排序字段集合");
-        tableInfoDTOS.add(queryDTO);
+        queryDTOs.add(queryDTO);
+        return queryDTOs;
     }
 
 }
