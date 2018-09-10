@@ -11,6 +11,7 @@ public class DatabaseDTO {
     private String url;
     private Integer dataBaseType;
     private String tableName;
+    private String modelName;
     private String tableSchema;
 
     public String getUserName() {
@@ -56,6 +57,14 @@ public class DatabaseDTO {
         this.tableName = tableName;
     }
 
+    public String getModelName() {
+        return modelName;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
+    }
+
     public String getTableSchema() {
         return tableSchema;
     }
@@ -63,4 +72,6 @@ public class DatabaseDTO {
     public void setTableSchema(String tableSchema) {
         this.tableSchema = tableSchema;
     }
+
+
 }

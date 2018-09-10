@@ -17,7 +17,7 @@ import java.util.Map;
  * @Author shusheng
  * @Date 18/8/13 下午2:24
  */
-@Component
+@Component("serviceCreateComponent")
 public class ServiceCreateComponent extends AbstractComponentCreator {
     private final static Logger logger = LoggerFactory.getLogger(ServiceCreateComponent.class);
     private final static String SERVICE_PATH = "/service";
@@ -73,12 +73,45 @@ public class ServiceCreateComponent extends AbstractComponentCreator {
 
     @Override
     protected String getImplementsResourcePath() {
-        return null;
+        return "java_template/ServiceImplements.txt";
     }
 
     @Override
     protected Map<String, String> getImplementsTargetMap(String fileName, TableInfoDTO tableInfoDTO) {
-        return null;
+        Map<String, String> targetMap = new HashMap<>();
+        String className = fileName + "ServiceImpl";
+        String interFaceName = fileName + "Service";
+        String daoName = fileName + "DAO";
+        targetMap.put("$FileNameServiceImpl", className);
+        targetMap.put("$FileNameService", interFaceName);
+        targetMap.put("$FileNameDAO", daoName);
+
+        String param = fileName.toLowerCase().substring(0, 1) + fileName.substring(1);
+        String paramDTO = param + "DTO";
+        String typeDTO = fileName + "DTO";
+        targetMap.put("$fileNameDTO", paramDTO);
+        targetMap.put("$FileNameDTO", typeDTO);
+
+        String paramDO = param + "DO";
+        String typeDO = fileName + "DO";
+        targetMap.put("$fileNameDO", paramDO);
+        targetMap.put("$FileNameDO", typeDO);
+
+        String paramDomain = param;
+        String typeDomain = fileName;
+        targetMap.put("$fileName", paramDomain);
+        targetMap.put("$FileName", typeDomain);
+
+        targetMap.put("$FileNameQuery", fileName + "Query");
+        targetMap.put("$fileNameQuery", param + "Query");
+
+        String daoParam = param + "DAO";
+        targetMap.put("$fileNameDAO", daoParam);
+
+        String dataType = mysqlDataTypeTransferComponent.transfer(tableInfoDTO.getDataType());
+        targetMap.put("$DataType", dataType);
+
+        return targetMap;
     }
 
 }

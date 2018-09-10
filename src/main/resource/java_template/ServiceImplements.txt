@@ -1,0 +1,61 @@
+package;
+@Service
+public class $FileNameServiceImpl implements $FileNameService{
+
+    @Autowired
+    private $FileNameDAO $fileNameDAO;
+
+    @Override
+    public Integer insert($FileNameDTO $fileNameDTO) {
+        return $fileNameDAO.insert(convertToDO($fileNameDTO));
+    }
+
+    @Override
+    public Integer updateByCondition($FileNameDTO $fileNameDTO) {
+        return $fileNameDAO.updateByCondition(convertToDO($fileNameDTO));
+    }
+
+    @Override
+    public Integer updateById($DataType id) {
+        return $fileNameDAO.updateById(id);
+    }
+
+    @Override
+    public List<$FileNameDTO> queryByCondition($FileNameQuery $fileNameQuery) {
+        return convertToDTO($fileNameDAO.queryByCondition($fileNameQuery));
+    }
+
+    @Override
+    public $FileNameDTO queryById($DataType id) {
+        $FileName result = $fileNameDAO.queryById(id);
+        $FileNameDTO dto = new $FileNameDTO();
+        BeanUtils.copyProperties(result, dto);
+        return dto;
+    }
+
+    @Override
+    public Integer deleteByCondition($FileNameDTO $fileNameDTO) {
+        return $fileNameDAO.deleteByCondition(convertToDO($fileNameDTO));
+    }
+
+    @Override
+    public Integer deleteById($DataType id) {
+        return $fileNameDAO.deleteById(id);
+    }
+
+    private $FileNameDO convertToDO($FileNameDTO $fileNameDTO) {
+        $FileNameDO $fileNameDO = new $FileNameDO();
+        BeanUtils.copyProperties($fileNameDTO, $fileNameDO);
+        return $fileNameDO;
+    }
+
+    private List<$FileNameDTO> convertToDTO(List<$FileName> sourceList) {
+        List<$FileNameDTO> list = new ArrayList<>();
+        for($FileName temp : sourceList) {
+            $FileNameDTO target = new $FileNameDTO();
+            BeanUtils.copyProperties(temp, target);
+            list.add(target);
+        }
+        return list;
+    }
+}

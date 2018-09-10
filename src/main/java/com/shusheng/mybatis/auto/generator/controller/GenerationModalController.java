@@ -1,18 +1,23 @@
 package com.shusheng.mybatis.auto.generator.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.shusheng.mybatis.auto.generator.databaseconnect.component.DownloadFileComponent;
 import com.shusheng.mybatis.auto.generator.databaseconnect.modal.DatabaseDTO;
 import com.shusheng.mybatis.auto.generator.databaseconnect.modal.DatabaseTypeEnum;
 import com.shusheng.mybatis.auto.generator.databaseconnect.service.AbstractConnectService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author shusheng
@@ -21,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping(value = "/generation")
 public class GenerationModalController {
+    private final static Logger logger = LoggerFactory.getLogger(GenerationModalController.class);
     @Autowired
     private AbstractConnectService abstractConnectService;
     @Autowired
@@ -40,14 +46,25 @@ public class GenerationModalController {
     }
 
     @PostMapping(value = "/connection")
+    @ResponseBody
     public String testConnection(HttpServletRequest request) {
-
-        return null;
+        Map<String, Object> isSuccess = new HashMap<>();
+        try {
+            DatabaseDTO databaseDTO = getQueryDTO(request);
+            isSuccess.put("isSuccess", abstractConnectService.testConnection(databaseDTO));
+            isSuccess.put("code", "0");
+        }catch(Exception e) {
+            logger.error(e.getMessage(), e);
+            isSuccess.put("code", "-1");
+            isSuccess.put("msg", "处理异常!");
+        }
+        return isSuccess.toString();
     }
 
     @PostMapping(value = "/file")
-    public void downloadGeneratorFile(HttpServletRequest request, HttpServletResponse response) {
+    public void downloadGeneratorFile(HttpServletRequest request, HttpServletResponse response) throws Exception {
         DatabaseDTO databaseDTO = getQueryDTO(request);
+        downloadFileComponent.downloadFile(databaseDTO, response);
     }
 
     @GetMapping(value = "/test")
@@ -65,14 +82,25 @@ public class GenerationModalController {
         return null;
     }
 
-    private DatabaseDTO getQueryDTO(HttpServletRequest request) {
+    private DatabaseDTO getQueryDTO(HttpServletRequest request) throws Exception {
         String url = request.getParameter("url");
         String userName = request.getParameter("userName");
         String password = request.getParameter("password");
-        String database = request.getParameter("databaseCode");
+        Integer database = Integer.parseInt(request.getParameter("databaseCode"));
+        String tableName = request.getParameter("tableName");
+        String modelName = request.getParameter("modelName");
+        String tableSchema = request.getParameter("tableSchema");
+
         DatabaseDTO databaseDTO = new DatabaseDTO();
-        databaseDTO.setUrl(url).setUserName(userName).setPassword(password)
-                .setDataBaseType(Integer.parseInt(database));
+        databaseDTO.setUserName(userName).setPassword(password)
+                .setDataBaseType(database);
+        databaseDTO.setModelName(modelName);
+        databaseDTO.setTableName(tableName);
+        databaseDTO.setTableSchema(tableSchema);
+        if(DatabaseTypeEnum.MYSQL.getCode().equals(database)) {
+            databaseDTO.setUrl("jdbc:mysql://" + url + "/information_schema");
+        }
+
         return databaseDTO;
     }
 }

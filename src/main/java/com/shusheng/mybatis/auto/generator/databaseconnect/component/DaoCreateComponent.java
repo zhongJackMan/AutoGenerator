@@ -15,7 +15,7 @@ import java.util.Map;
  * @Author shusheng
  * @createTime 2018/8/13/ 下午11:16
  */
-@Component
+@Component("daoCreateComponent")
 public class DaoCreateComponent extends AbstractComponentCreator {
 
     private final static ThreadLocal<List<TableInfoDTO>> localList = new ThreadLocal<>();
