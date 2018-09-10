@@ -75,6 +75,7 @@ public class DownloadFileComponent {
         ZipOutputStream writeOut = new ZipOutputStream(response.getOutputStream());
         zipFile(writeOut, parentFile, "");
         writeOut.close();
+        fileComponent.deleteFile(parentFile);
     }
 
     private void zipFile(ZipOutputStream zipOutputStream, File file, String parentPath) throws Exception {

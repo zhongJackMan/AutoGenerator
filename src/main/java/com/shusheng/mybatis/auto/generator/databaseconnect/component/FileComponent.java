@@ -59,4 +59,20 @@ public class FileComponent {
         }
         return line;
     }
+
+    /**
+     * 删除本地文件
+     * @param file
+     */
+    public void deleteFile(File file) {
+        if(file.isDirectory()) {
+            File[] files = file.listFiles();
+            for(File temp : files) {
+                deleteFile(temp);
+            }
+        }else {
+            file.delete();
+        }
+        file.delete();
+    }
 }
