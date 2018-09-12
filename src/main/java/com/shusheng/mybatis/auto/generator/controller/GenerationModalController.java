@@ -1,7 +1,5 @@
 package com.shusheng.mybatis.auto.generator.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.shusheng.mybatis.auto.generator.databaseconnect.component.DownloadFileComponent;
 import com.shusheng.mybatis.auto.generator.databaseconnect.modal.DatabaseDTO;
 import com.shusheng.mybatis.auto.generator.databaseconnect.modal.DatabaseTypeEnum;
@@ -12,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,7 +32,7 @@ public class GenerationModalController {
     /**
      * 初始化页面
      */
-    @GetMapping(value = "/temp")
+    @GetMapping(value = "/index")
     public String init(ModelMap map) {
         return "index";
     }
