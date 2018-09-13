@@ -1,81 +1,231 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.w3.org/1999/xhtml">
-<head th:include = "import-base/basic.html :: basicMeta">
+<head th:include="import-base/basic.html :: basicMeta">
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
 
-  <header class="main-header" th:include = "import-base/basic.html :: basicHeader" />
-  <aside class="main-sidebar" th:include = "import-base/basic.html :: leftMenu" />
+    <header class="main-header" th:include="import-base/basic.html :: basicHeader"/>
+    <aside class="main-sidebar" th:include="import-base/basic.html :: leftMenu"/>
 
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper" id="main-generator-section">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1>
-        Dashboard
-        <small>Control panel</small>
-      </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">Dashboard</li>
-      </ol>
-    </section>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper" id="main-generator-section">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                Dashboard
+                <small>Control panel</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+                <li class="active">Dashboard</li>
+            </ol>
+        </section>
 
-    <!-- Main content -->
-    <section class="content">
-      <div class="row">
-        <div class="col-xs-12">
-          <div class="box">
-            <div class="box-header">
-              <form role="form" action="">
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <form role="form" id="searchForm" method="post">
+                                <input type="hidden" name="pageNo" id="pageNo" v-model="queryData.pageNo"/>
+                                <input type="hidden" name="pageSize" id="pageSize" v-model="queryData.pageSize"/>
+                                <div class="box-body">
+                                    <div class="form-group col-xs-5">
+                                        <label for="url">数据库地址:</label>
+                                        <input class="form-control" type="text" name="url" id="url" v-model="queryData.url" placeholder="ip or domain"/>
+                                    </div>
+                                    <div class="form-group col-xs-4" >
+                                        <label for="userName">用户名:</label>
+                                        <input class="form-control"  type="text" name="userName" id="userName" v-model="queryData.userName" placeholder="请输入用户名..."/>
+                                    </div>
+                                    <div class="form-group col-xs-3" >
+                                        <label for="password">密码:</label>
+                                        <input class="form-control"  type="text" name="password" id="password" v-model="queryData.password" placeholder="请输入密码..." />
+                                    </div>
+                                    <div class="form-group col-xs-3" >
+                                        <label for="tableSchema">数据库名:</label>
+                                        <input class="form-control"  type="text" name="tableSchema" id="tableSchema" v-model="queryData.tableSchema" placeholder="请输入数据库名..."/>
+                                    </div>
+                                    <div class="form-group col-xs-3" >
+                                        <label for="tableSchema">端口:</label>
+                                        <input class="form-control"  type="text" name="port" id="port" v-model="queryData.port" placeholder="默认3306..."/>
+                                    </div>
+                                    <div class="form-group col-xs-4" >
+                                        <label for="databaseCode">数据库类型:</label>
+                                        <select class="form-control" id="databaseCode" name="databaseCode" v-model="queryData.databaseCode">
+                                        <option value="0" selected>mysql</option>
+                                        <option value="1">oracle</option>
+                                        <option value="2">sqlServer</option>
+                                        </select>
+                                    </div>
 
-              </form>
+                                </div>
+                                <div class="box-footer" style="text-align: center">
+                                    <button type="submit" class="btn btn-primary" @click="formSubmit('generation/list')"> 查询</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <table id="example2" class="table table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>表名</th>
+                                    <th>标注释</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+
+                                <tbody >
+                                    <template v-for="(item, key) in dataArray">
+                                        <tr>
+                                            <td>{{item.tableName}}</td>
+                                            <td>{{item.tableComment}}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-block btn-default"
+                                                        @click="showModal(item.tableName)">生成代码</button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /.box -->
+                </div>
+                <!-- /.col -->
             </div>
-            <!-- /.box-header -->
-            <div class="box-body">
-              <table id="example2" class="table table-bordered table-hover">
-                <thead>
-                <tr>
-                  <th>Rendering engine</th>
-                  <th>Browser</th>
-                  <th>Platform(s)</th>
-                  <th>Engine version</th>
-                  <th>CSS grade</th>
-                </tr>
-                </thead>
+            <!-- /.row -->
 
-                <tbody>
+            <!-- modal -->
+            <div class="modal fade" id="downLoadModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Default Modal</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="col-xs-12">
+                                <div class="box">
+                                    <div class="box-header">
+                                        <form role="form" id="downloadForm">
 
-                </tbody>
+                                            <div class="form-group col-xs-5">
+                                                <label for="tableName">表名:</label>
+                                                <input class="form-control" type="text" name="tableName" id="tableName" v-model="currentTableName" disabled/>
+                                            </div>
 
-              </table>
+                                            <div class="form-group col-xs-5">
+                                                <label for="modelName">模型名称:</label>
+                                                <input class="form-control" type="text" name="modelName" id="modelName" v-model="modelName" placeholder="不填时, 以表名作为模型名称..."/>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="box-body">
+                                <table id="columnTable" class="table table-bordered table-hover">
+                                    <thead>
+                                        <th>列名</th>
+                                        <th>字段类型</th>
+                                        <th>备注</th>
+                                    </thead>
+
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="box-footer" style="text-align: center">
+                                <button type="button" class="btn btn-block btn-success"
+                                        @click="showModal(item.tableName)">下载</button>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                            <button type="button" class="btn btn-primary">下载</button>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
             </div>
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
-        </div>
-        <!-- /.col -->
-      </div>
-      <!-- /.row -->
-    </section>
-    <!-- /.content -->
-  </div>
+
+        </section>
+        <!-- /.content -->
+    </div>
 
 </div>
 <!-- ./wrapper -->
 
-<script>
-  $.widget.bridge('uibutton', $.ui.button);
+<script th:src="@{/js/main.js}" type="module"></script>
+<script type="module" th:inline="javascript">
 
-  import {test} from '../static/js/my.js';
+    import * as my from '../js/main.js';
 
-  var app = new Vue({
-      el:'#main-generator-section',
-      data:{
+    var app = new Vue({
+        el: '#main-generator-section',
+        data: {
+            queryData: {
+                'url': [[${query.url}]],
+                'userName': [[${query.userName}]],
+                'password': [[${query.password}]],
+                'databaseCode': [[${query.databaseCode}]],
+                'tableSchema': [[${query.tableSchema}]],
+                'port':[[${query.port}]],
+                'pageNo': [[${query.pageNo}]],
+                'pageSize': [[${query.pageSize}]]
+            },
+            dataArray: [],
+            currentTableName: '',
+            modelName: '',
+            columnArray: []
 
-      }
-  });
+        },
+        mounted: function () {
+           this.dataArrayInit();
+        },
+        methods: {
+            dataArrayInit: function () {
+              var list = [[${data}]];
+              for(var i = 0; i < list.length; i++) {
+                  var temp = {
+                      'tableName': list[i].tableName,
+                      'tableComment': list[i].tableComment
+                  };
+                  this.dataArray.push(temp);
+              }
+            },
+            formSubmit: function(uri) {
+                var form = $('#searchForm');
+                var url = my.getUrlPrefix() + uri;
+                form.attr('action', url);
+                form.submit();
+            },
+            showModal: function (tableName) {
+                console.log(tableName);
+                app.currentTableName = tableName;
+
+                var searchData = decodeURIComponent(my.getFormData('searchForm'), true);
+                var columnData = decodeURIComponent(my.getFormData('downloadForm'), true);
+                searchData[tableName] = columnData.tableName;
+                searchData[modelName] = columnData.modelName;
+
+                var result = my.ajaxQuery(my.getUrlPrefix() + "generation/columns/list", searchData);
+                $('#downLoadModal').modal();
+            }
+        }
+    });
 </script>
 </body>
 </html>

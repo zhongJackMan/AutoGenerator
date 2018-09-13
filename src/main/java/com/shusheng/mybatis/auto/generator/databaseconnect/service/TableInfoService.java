@@ -5,6 +5,7 @@ import com.shusheng.mybatis.auto.generator.databaseconnect.modal.TableInfoDTO;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author shusheng
@@ -19,4 +20,16 @@ public interface TableInfoService {
      * @return
      */
     List<TableInfoDTO> getTableInfo(final Connection connection, final DatabaseDTO databaseDTO);
+
+    /**
+     * 查询库所有的表
+     * @param connection
+     * @param databaseDTO
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    List<Map<String, String>> getTableNames(final Connection connection, final DatabaseDTO databaseDTO,
+                                              final Integer pageNo, final Integer pageSize);
 }
+

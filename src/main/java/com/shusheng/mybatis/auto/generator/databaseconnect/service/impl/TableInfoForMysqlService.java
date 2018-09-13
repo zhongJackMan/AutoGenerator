@@ -11,7 +11,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author shusheng
@@ -35,14 +37,40 @@ public class TableInfoForMysqlService implements TableInfoService {
             resultList = new ArrayList<>();
             while (resultSet.next()) {
                 TableInfoDTO dto = new TableInfoDTO();
+                resultList.add(dto);
                 dto.setColumnName(resultSet.getString("COLUMN_NAME"))
                         .setDataType(resultSet.getString("DATA_TYPE"))
                         .setColumnComment(resultSet.getString("COLUMN_COMMENT"));
-                resultList.add(dto);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
         return resultList;
+    }
+
+    @Override
+    public List<Map<String, String>> getTableNames(Connection connection, DatabaseDTO databaseDTO, Integer pageNo, Integer pageSize) {
+        List<Map<String, String>> result = null;
+        try {
+            StringBuilder executeSql = new StringBuilder("select TABLE_NAME, TABLE_COMMENT from TABLES");
+            executeSql.append(" where TABLE_SCHEMA = ? limit ?, ?");
+            logger.error("the query sql is : " + executeSql.toString());
+            PreparedStatement preparedStatement = connection.prepareStatement(executeSql.toString());
+            preparedStatement.setString(1, databaseDTO.getTableSchema());
+            preparedStatement.setInt(2, pageNo);
+            preparedStatement.setInt(3, pageSize);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            result = new ArrayList<>();
+            while(resultSet.next()) {
+                Map<String, String> map = new HashMap<>(1);
+                result.add(map);
+                map.put("tableName", resultSet.getString("TABLE_NAME"));
+                map.put("tableComment", resultSet.getString("TABLE_COMMENT"));
+            }
+        }catch(Exception e) {
+            logger.error("query table error", e);
+        }
+        return result;
     }
 }

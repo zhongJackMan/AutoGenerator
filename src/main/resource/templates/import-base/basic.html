@@ -27,9 +27,9 @@
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <!-- js -->
-    <script type="text/javascript" th:src="@{/js/jquery.js}"></script>
+    <script th:src="@{/js/jquery.js}"></script>
     <script th:src="@{/css/bootstrap/dist/js/bootstrap.min.js}"></script>
-    <script type="text/javascript" th:src="@{/js/vue.js}"></script>
+    <script th:src="@{/js/vue.js}"></script>
 </head>
 <body>
 
@@ -497,6 +497,10 @@
             <!--<li><a href="#"><i class="fa fa-circle-o text-yellow"></i> <span>Warning</span></a></li>-->
             <!--<li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span>Information</span></a></li>-->
         </ul>
+        <div style="display: none">
+        <a th:href="${#httpServletRequest.getScheme() + '://' + #httpServletRequest.getServerName() + ':' + #request.getServerPort()  + #request.getContextPath() + '/'} "
+           id="contextPath"></a>
+        </div>
     </section>
     <!-- /.sidebar -->
 </aside>
