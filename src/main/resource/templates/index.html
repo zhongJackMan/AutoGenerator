@@ -34,36 +34,44 @@
                                 <div class="box-body">
                                     <div class="form-group col-xs-5">
                                         <label for="url">数据库地址:</label>
-                                        <input class="form-control" type="text" name="url" id="url" v-model="queryData.url" placeholder="ip or domain"/>
+                                        <input class="form-control" type="text" name="url" id="url"
+                                               v-model="queryData.url" placeholder="ip or domain"/>
                                     </div>
-                                    <div class="form-group col-xs-4" >
+                                    <div class="form-group col-xs-4">
                                         <label for="userName">用户名:</label>
-                                        <input class="form-control"  type="text" name="userName" id="userName" v-model="queryData.userName" placeholder="请输入用户名..."/>
+                                        <input class="form-control" type="text" name="userName" id="userName"
+                                               v-model="queryData.userName" placeholder="请输入用户名..."/>
                                     </div>
-                                    <div class="form-group col-xs-3" >
+                                    <div class="form-group col-xs-3">
                                         <label for="password">密码:</label>
-                                        <input class="form-control"  type="text" name="password" id="password" v-model="queryData.password" placeholder="请输入密码..." />
+                                        <input class="form-control" type="text" name="password" id="password"
+                                               v-model="queryData.password" placeholder="请输入密码..."/>
                                     </div>
-                                    <div class="form-group col-xs-3" >
+                                    <div class="form-group col-xs-3">
                                         <label for="tableSchema">数据库名:</label>
-                                        <input class="form-control"  type="text" name="tableSchema" id="tableSchema" v-model="queryData.tableSchema" placeholder="请输入数据库名..."/>
+                                        <input class="form-control" type="text" name="tableSchema" id="tableSchema"
+                                               v-model="queryData.tableSchema" placeholder="请输入数据库名..."/>
                                     </div>
-                                    <div class="form-group col-xs-3" >
+                                    <div class="form-group col-xs-3">
                                         <label for="tableSchema">端口:</label>
-                                        <input class="form-control"  type="text" name="port" id="port" v-model="queryData.port" placeholder="默认3306..."/>
+                                        <input class="form-control" type="text" name="port" id="port"
+                                               v-model="queryData.port" placeholder="默认3306..."/>
                                     </div>
-                                    <div class="form-group col-xs-4" >
+                                    <div class="form-group col-xs-4">
                                         <label for="databaseCode">数据库类型:</label>
-                                        <select class="form-control" id="databaseCode" name="databaseCode" v-model="queryData.databaseCode">
-                                        <option value="0" selected>mysql</option>
-                                        <option value="1">oracle</option>
-                                        <option value="2">sqlServer</option>
+                                        <select class="form-control" id="databaseCode" name="databaseCode"
+                                                v-model="queryData.databaseCode">
+                                            <option value="0">mysql</option>
+                                            <option value="1">oracle</option>
+                                            <option value="2">sqlServer</option>
                                         </select>
                                     </div>
 
                                 </div>
                                 <div class="box-footer" style="text-align: center">
-                                    <button type="submit" class="btn btn-primary" @click="formSubmit('generation/list')"> 查询</button>
+                                    <button type="submit" class="btn btn-primary"
+                                            @click="formSubmit('searchForm', 'generation/list')"> 查询
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -73,22 +81,26 @@
                                 <thead>
                                 <tr>
                                     <th>表名</th>
-                                    <th>标注释</th>
+                                    <th>表注释</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>
 
-                                <tbody >
-                                    <template v-for="(item, key) in dataArray">
-                                        <tr>
-                                            <td>{{item.tableName}}</td>
-                                            <td>{{item.tableComment}}</td>
-                                            <td>
-                                                <button type="button" class="btn btn-block btn-default"
-                                                        @click="showModal(item.tableName)">生成代码</button>
-                                            </td>
-                                        </tr>
-                                    </template>
+                                <tbody>
+                                <template v-if="code != 0">
+                                    <tr th:text="${msg}"></tr>
+                                </template>
+                                <template v-for="(item, key) in dataArray">
+                                    <tr>
+                                        <td>{{item.tableName}}</td>
+                                        <td>{{item.tableComment}}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-block btn-default"
+                                                    @click="showModal(item.tableName)">生成代码
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
                                 </tbody>
 
                             </table>
@@ -114,16 +126,25 @@
                             <div class="col-xs-12">
                                 <div class="box">
                                     <div class="box-header">
-                                        <form role="form" id="downloadForm">
+                                        <form role="form" id="downloadForm" method="post">
+
+                                            <input type="hidden" name="url" v-model="queryData.url"/>
+                                            <input type="hidden" name="userName" v-model="queryData.userName"/>
+                                            <input type="hidden" name="password" v-model="queryData.password"/>
+                                            <input type="hidden" name="databaseCode" v-model="queryData.databaseCode"/>
+                                            <input type="hidden" name="tableSchema" v-model="queryData.tableSchema"/>
+                                            <input type="hidden" name="port" v-model="queryData.port"/>
 
                                             <div class="form-group col-xs-5">
                                                 <label for="tableName">表名:</label>
-                                                <input class="form-control" type="text" name="tableName" id="tableName" v-model="currentTableName" disabled/>
+                                                <input class="form-control" type="text" name="tableName" id="tableName"
+                                                       v-model="currentTableName" />
                                             </div>
 
                                             <div class="form-group col-xs-5">
                                                 <label for="modelName">模型名称:</label>
-                                                <input class="form-control" type="text" name="modelName" id="modelName" v-model="modelName" placeholder="不填时, 以表名作为模型名称..."/>
+                                                <input class="form-control" type="text" name="modelName" id="modelName"
+                                                       v-model="modelName" placeholder="不填时, 以表名作为模型名称..."/>
                                             </div>
 
                                         </form>
@@ -134,26 +155,28 @@
                             <div class="box-body">
                                 <table id="columnTable" class="table table-bordered table-hover">
                                     <thead>
-                                        <th>列名</th>
-                                        <th>字段类型</th>
-                                        <th>备注</th>
+                                    <th>列名</th>
+                                    <th>字段类型</th>
+                                    <th>备注</th>
                                     </thead>
 
                                     <tbody>
-
+                                    <template v-for="(item, key) in columnArray">
+                                        <tr>
+                                            <td>{{item.columnName}}</td>
+                                            <td>{{item.dataType}}</td>
+                                            <td>{{item.columnComment}}</td>
+                                            <td></td>
+                                        </tr>
+                                    </template>
                                     </tbody>
                                 </table>
-                            </div>
-
-                            <div class="box-footer" style="text-align: center">
-                                <button type="button" class="btn btn-block btn-success"
-                                        @click="showModal(item.tableName)">下载</button>
                             </div>
 
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                            <button type="button" class="btn btn-primary">下载</button>
+                            <button type="button" class="btn btn-primary" @click="formSubmit('downloadForm', 'generation/file')">下载</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -174,58 +197,69 @@
     import * as my from '../js/main.js';
 
     var app = new Vue({
-        el: '#main-generator-section',
-        data: {
-            queryData: {
-                'url': [[${query.url}]],
-                'userName': [[${query.userName}]],
-                'password': [[${query.password}]],
-                'databaseCode': [[${query.databaseCode}]],
-                'tableSchema': [[${query.tableSchema}]],
-                'port':[[${query.port}]],
-                'pageNo': [[${query.pageNo}]],
-                'pageSize': [[${query.pageSize}]]
-            },
-            dataArray: [],
-            currentTableName: '',
-            modelName: '',
-            columnArray: []
+            el: '#main-generator-section',
+            data: {
+                queryData: {
+                    'url': [[${query.url}]],
+                    'userName': [[${query.userName}]],
+                    'password': [[${query.password}]],
+                    'databaseCode': [[${query.databaseCode}]],
+                    'tableSchema': [[${query.tableSchema}]],
+                    'port': [[${query.port}]],
+                    'pageNo': [[${query.pageNo}]],
+                    'pageSize': [[${query.pageSize}]]
+                },
+                dataArray: [],
+                currentTableName: '',
+                modelName: '',
+                columnArray: [],
+                code: ''
 
-        },
-        mounted: function () {
-           this.dataArrayInit();
-        },
-        methods: {
-            dataArrayInit: function () {
-              var list = [[${data}]];
-              for(var i = 0; i < list.length; i++) {
-                  var temp = {
-                      'tableName': list[i].tableName,
-                      'tableComment': list[i].tableComment
-                  };
-                  this.dataArray.push(temp);
-              }
             },
-            formSubmit: function(uri) {
-                var form = $('#searchForm');
-                var url = my.getUrlPrefix() + uri;
-                form.attr('action', url);
-                form.submit();
+            mounted: function () {
+                this.dataArrayInit();
             },
-            showModal: function (tableName) {
-                console.log(tableName);
-                app.currentTableName = tableName;
+            methods: {
+                dataArrayInit: function () {
+                    var list = [[${data}]];
+                    for (var i = 0; i < list.length; i++) {
+                        var temp = {
+                            'tableName': list[i].tableName,
+                            'tableComment': list[i].tableComment
+                        };
+                        this.dataArray.push(temp);
+                    }
+                    this.code = [[${code}]];
+                },
+                formSubmit: function (formId, uri) {
+                    var form = $('#' + formId);
+                    console.log(form.serializeArray());
+                    var url = my.getUrlPrefix() + uri;
+                    form.attr('action', url);
+                    form.submit();
+                },
+                showModal: function (tableName) {
+                    app.currentTableName = tableName;
+                    console.log(app.currentTableName);
 
-                var searchData = decodeURIComponent(my.getFormData('searchForm'), true);
-                var columnData = decodeURIComponent(my.getFormData('downloadForm'), true);
-                searchData[tableName] = columnData.tableName;
-                searchData[modelName] = columnData.modelName;
+                    var searchData = my.getFormData('searchForm');
+                    searchData['tableName'] = tableName;
 
-                var result = my.ajaxQuery(my.getUrlPrefix() + "generation/columns/list", searchData);
-                $('#downLoadModal').modal();
+                    var result = my.ajaxQuery(my.getUrlPrefix() + "generation/columns/list", searchData, false);
+                    var list = result.list;
+                    for (var i = 0; i < list.length; i++) {
+                        var temp = {
+                            'columnName': list[i].columnName,
+                            'dataType': list[i].dataType,
+                            'columnComment': list[i].columnComment
+                        };
+                        app.columnArray.push(temp);
+                    }
+                    $('#downLoadModal').modal();
+                }
             }
-        }
-    });
+        })
+    ;
 </script>
 </body>
 </html>

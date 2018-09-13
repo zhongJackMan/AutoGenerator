@@ -125,21 +125,6 @@ public class GenerationModalController {
         downloadFileComponent.downloadFile(databaseDTO, response);
     }
 
-    @GetMapping(value = "/test")
-    public String testGenerator(HttpServletResponse response) {
-        DatabaseDTO databaseDTO = new DatabaseDTO();
-        databaseDTO.setDataBaseType(DatabaseTypeEnum.MYSQL.getCode());
-        databaseDTO.setUserName("tbj");
-        databaseDTO.setPassword("tbj900900");
-        databaseDTO.setTableName("crs_share_201802");
-        databaseDTO.setTableSchema("crs");
-        databaseDTO.setUrl("jdbc:mysql://db.tbj.com/information_schema");
-        try {
-            downloadFileComponent.downloadFile(databaseDTO, response);
-        }catch (Exception e){}
-        return null;
-    }
-
     private Pair<DatabaseDTO, QueryVO> getQueryDTO(HttpServletRequest request) throws Exception {
         String url = request.getParameter("url");
         String userName = request.getParameter("userName");

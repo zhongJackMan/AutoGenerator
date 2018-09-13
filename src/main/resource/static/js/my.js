@@ -9,18 +9,24 @@ export function getUrlPrefix() {
 
 export function getFormData(formId) {
     var id = '#' + formId;
-    var data = $(id).serialize();
-    console.log(data);
-    return data;
+    var data = $(id).serializeArray();
+    var jsonData = {};
+    $.each(data,function(i,item){
+
+        jsonData[item.name] = item.value;
+
+    });
+    return jsonData;
 }
 
-export function ajaxQuery(url, param) {
-    var successResult;
+export function ajaxQuery(url, param, async) {
+    var result;
     $.ajax({
         type: 'post',
         url: url,
         data: param,
         dataType: 'json',
+        async:async,
         success: function(data) {
             console.log(data);
             if(data.code < 0) {
@@ -28,16 +34,8 @@ export function ajaxQuery(url, param) {
                 window.location.reload();
                 return;
             }
-            successResult = data;
+            result = data;
         }
     });
-    console.log(successResult);
-    return successResult;
+    return result;
 }
-
-//
-// export {
-//     test,
-//     getUrlPrefix,
-//     getFormData
-// }
